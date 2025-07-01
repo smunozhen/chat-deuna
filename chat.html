@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Deuna IA</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #F4F0F9;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  background: url('icon-deuna.png') no-repeat center center;
+  background-size: contain;
+  transform: translate(-50%, -50%);
+  opacity: 0.08;
+  z-index: 0;
+}
+
+   #chat-container {
+  width: 400px;
+  height: 600px;
+  background: white url('icon-deuna.png') no-repeat center center;
+  background-size: 260px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: lighten;
+  opacity: 1;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+}
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: #512A6F;
+      color: white;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+#messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+
+    .message {
+      padding: 8px 12px;
+      border-radius: 20px;
+      max-width: 80%;
+      width: fit-content;
+    }
+
+    .bot {
+      background-color: #E4E6EB;
+      align-self: flex-start;
+    }
+
+    .user {
+      background-color: #00CCB3;
+      color: white;
+      align-self: flex-end;
+    }
+
+    #input-form {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #input {
+      flex-grow: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    #send {
+      padding: 10px;
+      background: #512A6F;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #messages::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;
+  height: 260px;
+  background: url('icon-deuna.png') no-repeat center center;
+  background-size: contain;
+  opacity: 0.06;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <header>
+      <img src="icon-deuna.png" alt="Logo Deuna" />
+      <h1>Chat Deuna</h1>
+    </header>
+    <div id="messages"></div>
+    <form id="input-form">
+      <input type="text" id="input" placeholder="Escribe tu mensaje..." required />
+      <button type="submit" id="send">Enviar</button>
+    </form>
+  </div>
+
+  <script>
+    const webhookURL = 'https://saramuhen.app.n8n.cloud/webhook/chat-agent';
+    const sessionId = 'gerencia-001';
+
+    const form = document.getElementById('input-form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      msg.textContent = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    window.onload = () => {
+      appendMessage('👋 ¡Bienvenido al Chat IA de Deuna! ¿En qué puedo ayudarte hoy?', 'bot');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMessage = input.value;
+      appendMessage(userMessage, 'user');
+      input.value = '';
+
+      try {
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            action: 'sendMessage',
+            chatInput: userMessage
+          })
+        });
+
+        const data = await response.json();
+        appendMessage(data.respuesta || '🤖 Sin respuesta del agente.', 'bot');
+      } catch (error) {
+        appendMessage('⚠️ Error al conectar con el agente.', 'bot');
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
