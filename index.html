@@ -154,13 +154,27 @@ body::before {
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
 
-    function appendMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.classList.add('message', sender);
-      msg.textContent = text;
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
-    }
+   function formatMessageContent(text) {
+  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+
+  const isList = lines.every(line => /^(\d+\.\s+|- )/.test(line));
+
+  if (isList) {
+    return '<ul>' + lines.map(line => {
+      return `<li>${line.replace(/^(\d+\.\s+|- )/, '')}</li>`;
+    }).join('') + '</ul>';
+  } else {
+    return lines.join('<br>');
+  }
+}
+
+function appendMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.classList.add('message', sender);
+  msg.innerHTML = formatMessageContent(text);
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+}
 
     window.onload = () => {
       appendMessage('👋 ¡Bienvenido al Chat IA de Deuna! ¿En qué puedo ayudarte hoy?', 'bot');
