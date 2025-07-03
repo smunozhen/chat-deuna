@@ -84,7 +84,9 @@ body::before {
       border-radius: 20px;
       max-width: 80%;
       width: fit-content;
+      line-height: 1.5; 
     }
+
 
     .bot {
       background-color: #E4E6EB;
@@ -155,24 +157,23 @@ body::before {
     const messages = document.getElementById('messages');
 
    function formatMessageContent(text) {
-  const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
-  let result = '';
-
-  paragraphs.forEach(paragraph => {
-    const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean);
-    const isList = lines.every(line => /^(\d+\.\s+|- )/.test(line));
-
-    if (isList) {
-      result += '<ul>' + lines.map(line =>
-        `<li>${line.replace(/^(\d+\.\s+|- )/, '')}</li>`
-      ).join('') + '</ul>';
-    } else {
-      result += `<p>${lines.join('<br>')}</p>`;
+    const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+    let result = '';
+  
+      paragraphs.forEach(paragraph => {
+        const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean);
+        const isList = lines.every(line => /^(\d+\.\s+|- )/.test(line));
+    
+          if (isList) {
+            result += '<ul>' + lines.map(line =>
+              `<li>${line.replace(/^(\d+\.\s+|- )/, '')}</li>`
+            ).join('') + '</ul>';
+          } else {
+            result += `<p>${lines.join('<br>')}</p>`;
+          }
+        });
+      return result;
     }
-  });
-
-  return result;
-}
 
 
 function appendMessage(text, sender) {
