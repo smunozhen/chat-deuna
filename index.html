@@ -155,18 +155,25 @@ body::before {
     const messages = document.getElementById('messages');
 
    function formatMessageContent(text) {
-  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+  const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  let result = '';
 
-  const isList = lines.every(line => /^(\d+\.\s+|- )/.test(line));
+  paragraphs.forEach(paragraph => {
+    const lines = paragraph.split('\n').map(line => line.trim()).filter(Boolean);
+    const isList = lines.every(line => /^(\d+\.\s+|- )/.test(line));
 
-  if (isList) {
-    return '<ul>' + lines.map(line => {
-      return `<li>${line.replace(/^(\d+\.\s+|- )/, '')}</li>`;
-    }).join('') + '</ul>';
-  } else {
-    return lines.join('<br>');
-  }
+    if (isList) {
+      result += '<ul>' + lines.map(line =>
+        `<li>${line.replace(/^(\d+\.\s+|- )/, '')}</li>`
+      ).join('') + '</ul>';
+    } else {
+      result += `<p>${lines.join('<br>')}</p>`;
+    }
+  });
+
+  return result;
 }
+
 
 function appendMessage(text, sender) {
   const msg = document.createElement('div');
